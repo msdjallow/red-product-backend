@@ -3,10 +3,11 @@ const pool = require('../config/db');
 // 1. Récupérer tous les hôtels (READ)
 exports.getAllHotels = async (req, res) => {
     try {
-        const allHotels = await pool.query('SELECT * FROM hotels ORDER BY created_at DESC');
+        // Suppression du "ORDER BY created_at" qui faisait planter la requête
+        const allHotels = await pool.query('SELECT * FROM hotels ORDER BY id DESC');
         res.json(allHotels.rows);
     } catch (err) {
-        console.error(err.message);
+        console.error("Erreur getAllHotels:", err.message);
         res.status(500).send('Erreur serveur');
     }
 };
@@ -21,14 +22,14 @@ exports.createHotel = async (req, res) => {
         );
         res.status(201).json(newHotel.rows[0]);
     } catch (err) {
-        console.error(err.message);
+        console.error("Erreur createHotel:", err.message);
         res.status(500).send('Erreur serveur');
     }
 };
 
 // 3. Modifier un hôtel (UPDATE)
 exports.updateHotel = async (req, res) => {
-    const { id } = req.params; // On récupère l'ID dans l'URL
+    const { id } = req.params;
     const { name, address, email, phone, price, currency } = req.body;
     try {
         const updatedHotel = await pool.query(
@@ -42,7 +43,7 @@ exports.updateHotel = async (req, res) => {
         
         res.json({ message: "Hôtel mis à jour", hotel: updatedHotel.rows[0] });
     } catch (err) {
-        console.error(err.message);
+        console.error("Erreur updateHotel:", err.message);
         res.status(500).send('Erreur serveur');
     }
 };
@@ -59,7 +60,7 @@ exports.deleteHotel = async (req, res) => {
         
         res.json({ message: "Hôtel supprimé avec succès" });
     } catch (err) {
-        console.error(err.message);
+        console.error("Erreur deleteHotel:", err.message);
         res.status(500).send('Erreur serveur');
     }
 };
