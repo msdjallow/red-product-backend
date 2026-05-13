@@ -1,16 +1,20 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+// On utilise DATABASE_URL qui contient tout (user, host, password, port)
 const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false // Obligatoire pour se connecter à Render depuis l'extérieur
+    }
 });
 
 pool.on('connect', () => {
-    console.log('Connecté à la base de données PostgreSQL');
+    console.log('Connecté à la base de données PostgreSQL sur Render !');
+});
+
+pool.on('error', (err) => {
+    console.error('Erreur inattendue sur le client PostgreSQL', err);
 });
 
 module.exports = pool;
