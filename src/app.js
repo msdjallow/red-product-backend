@@ -36,3 +36,26 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Le serveur tourne sur le port ${PORT}`);
 });
+
+// Script temporaire pour créer automatiquement les nouvelles colonnes d'activation
+const pool = require('./src/config/db'); // Ajuste le chemin vers ton fichier db.js si nécessaire
+
+const updateDatabaseStructure = async () => {
+    try {
+        console.log("Vérification et mise à jour de la structure de la base de données...");
+        
+        await pool.query(`
+            ALTER TABLE users ADD COLUMN IF NOT EXISTS is_activated BOOLEAN DEFAULT FALSE;
+        `);
+        await pool.query(`
+            ALTER TABLE users ADD COLUMN IF NOT EXISTS activation_token VARCHAR(255);
+        `);
+        
+        console.log("🔥 Base de données mise à jour avec succès (colonnes is_activated et activation_token prêtes) !");
+    } catch (err) {
+        console.error("Erreur lors de la mise à jour de la base de données :", err.message);
+    }
+};
+
+// On lance la fonction
+updateDatabaseStructure();
