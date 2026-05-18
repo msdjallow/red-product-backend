@@ -37,13 +37,29 @@ app.listen(PORT, () => {
     console.log(`Le serveur tourne sur le port ${PORT}`);
 });
 
-// Script temporaire pour créer automatiquement les nouvelles colonnes d'activation
-const pool = require('./src/config/db'); // Ajuste le chemin vers ton fichier db.js si nécessaire
-
+// Script de migration sécurisé pour créer les colonnes sur Render
 const updateDatabaseStructure = async () => {
     try {
         console.log("Vérification et mise à jour de la structure de la base de données...");
         
+        // Détection automatique du bon chemin vers db.js
+        let pool;
+        try {
+            pool = require('./config/db');
+        } catch (e) {
+            try {
+                pool = require('../config/db');
+            } catch (err) {
+                try {
+                    pool = require('./src/config/db');
+                } catch (lastErr) {
+                    console.error("Impossible de trouver le fichier db.js");
+                    return;
+                }
+            }
+        }
+
+        // Exécution des requêtes SQL pour ajouter les colonnes d'activation
         await pool.query(`
             ALTER TABLE users ADD COLUMN IF NOT EXISTS is_activated BOOLEAN DEFAULT FALSE;
         `);
@@ -57,5 +73,5 @@ const updateDatabaseStructure = async () => {
     }
 };
 
-// On lance la fonction
+// On lance la fonction automatiquement au démarrage
 updateDatabaseStructure();
