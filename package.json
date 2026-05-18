@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "start": "node src/app.js",
-  "dev": "nodemon src/app.js"
-},
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -17,6 +17,7 @@
     "express": "^5.2.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^8.0.7",
     "pg": "^8.20.0"
   }
 }
