@@ -42,36 +42,24 @@ const updateDatabaseStructure = async () => {
     try {
         console.log("Vérification et mise à jour de la structure de la base de données...");
         
-        // Détection automatique du bon chemin vers db.js
         let pool;
-        try {
-            pool = require('./config/db');
-        } catch (e) {
-            try {
-                pool = require('../config/db');
-            } catch (err) {
-                try {
-                    pool = require('./src/config/db');
-                } catch (lastErr) {
-                    console.error("Impossible de trouver le fichier db.js");
-                    return;
-                }
+        try { pool = require('./config/db'); } catch (e) {
+            try { pool = require('../config/db'); } catch (err) {
+                try { pool = require('./src/config/db'); } catch (lastErr) { return; }
             }
         }
 
-        // Exécution des requêtes SQL pour ajouter les colonnes d'activation
-        await pool.query(`
-            ALTER TABLE users ADD COLUMN IF NOT EXISTS is_activated BOOLEAN DEFAULT FALSE;
-        `);
-        await pool.query(`
-            ALTER TABLE users ADD COLUMN IF NOT EXISTS activation_token VARCHAR(255);
-        `);
+        // Anciennes colonnes (activation)
+        await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_activated BOOLEAN DEFAULT FALSE;`);
+        await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS activation_token VARCHAR(255);`);
         
-        console.log("🔥 Base de données mise à jour avec succès (colonnes is_activated et activation_token prêtes) !");
+        // 🔑 NOUVELLES COLONNES : Pour le mot de passe oublié
+        await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_password_token VARCHAR(255);`);
+        await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_password_expires TIMESTAMP;`);
+        
+        console.log("🔥 Base de données mise à jour avec les colonnes de réinitialisation !");
     } catch (err) {
         console.error("Erreur lors de la mise à jour de la base de données :", err.message);
     }
 };
-
-// On lance la fonction automatiquement au démarrage
 updateDatabaseStructure();

@@ -9,4 +9,10 @@ router.post('/register', authController.register);
 router.post('/login', authController.login);
 // Route pour activer le compte (méthode GET car c'est un lien cliquable)
 router.get('/activate/:token', authController.activateAccount);
+// Demande de réinitialisation (envoi du mail)
+router.post('/forgot-password', authController.forgotPassword);
+
+// Soumission du nouveau mot de passe
+router.post('/reset-password/:token', authController.resetPassword);
+
 module.exports = router;
